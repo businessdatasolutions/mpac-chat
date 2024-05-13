@@ -1,0 +1,640 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.4.551">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+
+<title>test</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+</style>
+
+
+<script src="test_files/libs/clipboard/clipboard.min.js"></script>
+<script src="test_files/libs/quarto-html/quarto.js"></script>
+<script src="test_files/libs/quarto-html/popper.min.js"></script>
+<script src="test_files/libs/quarto-html/tippy.umd.min.js"></script>
+<script src="test_files/libs/quarto-html/anchor.min.js"></script>
+<link href="test_files/libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="test_files/libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="test_files/libs/bootstrap/bootstrap.min.js"></script>
+<link href="test_files/libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="test_files/libs/bootstrap/bootstrap.min.css" rel="stylesheet" id="quarto-bootstrap" data-mode="light">
+
+
+</head>
+
+<body class="fullcontent">
+
+<div id="quarto-content" class="page-columns page-rows-contents page-layout-article">
+
+<main class="content" id="quarto-document-content">
+
+
+
+
+<div id="cell-0" class="cell" data-execution_count="9">
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> requests</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> bs4 <span class="im">import</span> BeautifulSoup</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> lxml <span class="im">import</span> html</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div id="cell-1" class="cell" data-execution_count="11">
+<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Base URL for making relative links absolute</span></span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>base_url <span class="op">=</span> <span class="st">'https://www.stedin.net'</span></span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a><span class="co"># URL of the FAQ page</span></span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>url <span class="op">=</span> <span class="ss">f'</span><span class="sc">{</span>base_url<span class="sc">}</span><span class="ss">/klantenservice/veelgestelde-vragen/aansluiten-en-afsluiten'</span></span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a><span class="co"># Headers to mimic a browser request</span></span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a>headers <span class="op">=</span> {</span>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a>    <span class="st">'User-Agent'</span>: <span class="st">'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.36'</span></span>
+<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a><span class="co"># Request the main FAQ page</span></span>
+<span id="cb2-13"><a href="#cb2-13" aria-hidden="true" tabindex="-1"></a>response <span class="op">=</span> requests.get(url, headers<span class="op">=</span>headers)</span>
+<span id="cb2-14"><a href="#cb2-14" aria-hidden="true" tabindex="-1"></a>response.raise_for_status()  <span class="co"># Ensure the request was successful</span></span>
+<span id="cb2-15"><a href="#cb2-15" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-16"><a href="#cb2-16" aria-hidden="true" tabindex="-1"></a><span class="co"># Parse the main page HTML</span></span>
+<span id="cb2-17"><a href="#cb2-17" aria-hidden="true" tabindex="-1"></a>soup <span class="op">=</span> BeautifulSoup(response.text, <span class="st">'html.parser'</span>)</span>
+<span id="cb2-18"><a href="#cb2-18" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-19"><a href="#cb2-19" aria-hidden="true" tabindex="-1"></a><span class="co"># Find all &lt;a&gt; tags with a 'title' attribute, which seem to represent the questions</span></span>
+<span id="cb2-20"><a href="#cb2-20" aria-hidden="true" tabindex="-1"></a>question_links <span class="op">=</span> soup.find_all(<span class="st">'a'</span>, title<span class="op">=</span><span class="va">True</span>)</span>
+<span id="cb2-21"><a href="#cb2-21" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-22"><a href="#cb2-22" aria-hidden="true" tabindex="-1"></a><span class="co"># Iterate through each &lt;a&gt; tag, follow the link, and extract the answer</span></span>
+<span id="cb2-23"><a href="#cb2-23" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> link <span class="kw">in</span> question_links:</span>
+<span id="cb2-24"><a href="#cb2-24" aria-hidden="true" tabindex="-1"></a>    question_title <span class="op">=</span> link[<span class="st">'title'</span>]</span>
+<span id="cb2-25"><a href="#cb2-25" aria-hidden="true" tabindex="-1"></a>    answer_url <span class="op">=</span> link[<span class="st">'href'</span>]</span>
+<span id="cb2-26"><a href="#cb2-26" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb2-27"><a href="#cb2-27" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Make sure the URL is absolute</span></span>
+<span id="cb2-28"><a href="#cb2-28" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> <span class="kw">not</span> answer_url.startswith(<span class="st">'http'</span>):</span>
+<span id="cb2-29"><a href="#cb2-29" aria-hidden="true" tabindex="-1"></a>        answer_url <span class="op">=</span> base_url <span class="op">+</span> answer_url</span>
+<span id="cb2-30"><a href="#cb2-30" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb2-31"><a href="#cb2-31" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Fetch the page with the answer</span></span>
+<span id="cb2-32"><a href="#cb2-32" aria-hidden="true" tabindex="-1"></a>    answer_response <span class="op">=</span> requests.get(answer_url, headers<span class="op">=</span>headers)</span>
+<span id="cb2-33"><a href="#cb2-33" aria-hidden="true" tabindex="-1"></a>    answer_response.raise_for_status()</span>
+<span id="cb2-34"><a href="#cb2-34" aria-hidden="true" tabindex="-1"></a>    answer_soup <span class="op">=</span> BeautifulSoup(answer_response.text, <span class="st">'html.parser'</span>)</span>
+<span id="cb2-35"><a href="#cb2-35" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb2-36"><a href="#cb2-36" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Extract all the text from the answer div (modify the selector to fit the answer structure)</span></span>
+<span id="cb2-37"><a href="#cb2-37" aria-hidden="true" tabindex="-1"></a>    answer_divs <span class="op">=</span> answer_soup.find_all(<span class="st">'div'</span>, class_<span class="op">=</span><span class="st">'col-12'</span>)</span>
+<span id="cb2-38"><a href="#cb2-38" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb2-39"><a href="#cb2-39" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Loop through the divs to find the specific answer by checking the presence of the question in the h3 tag</span></span>
+<span id="cb2-40"><a href="#cb2-40" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> div <span class="kw">in</span> answer_divs:</span>
+<span id="cb2-41"><a href="#cb2-41" aria-hidden="true" tabindex="-1"></a>        h3_tag <span class="op">=</span> div.find(<span class="st">'h3'</span>)</span>
+<span id="cb2-42"><a href="#cb2-42" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> h3_tag <span class="kw">and</span> h3_tag.get_text(strip<span class="op">=</span><span class="va">True</span>) <span class="op">==</span> question_title:</span>
+<span id="cb2-43"><a href="#cb2-43" aria-hidden="true" tabindex="-1"></a>            <span class="co"># Extract all text content within this div</span></span>
+<span id="cb2-44"><a href="#cb2-44" aria-hidden="true" tabindex="-1"></a>            answer_text <span class="op">=</span> div.get_text(separator<span class="op">=</span><span class="st">' '</span>, strip<span class="op">=</span><span class="va">True</span>)</span>
+<span id="cb2-45"><a href="#cb2-45" aria-hidden="true" tabindex="-1"></a>            <span class="bu">print</span>(<span class="ss">f'Question: </span><span class="sc">{</span>question_title<span class="sc">}</span><span class="ss">'</span>)</span>
+<span id="cb2-46"><a href="#cb2-46" aria-hidden="true" tabindex="-1"></a>            <span class="bu">print</span>(<span class="ss">f'Answer: </span><span class="sc">{</span>answer_text<span class="sc">}</span><span class="ch">\n</span><span class="ss">'</span>)</span>
+<span id="cb2-47"><a href="#cb2-47" aria-hidden="true" tabindex="-1"></a>            <span class="cf">break</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Question: Afsluiten
+Answer: Aansluiten en afsluiten Afsluiten Capaciteit Aansluitingen Meter en meterkast Offertes en aansluitingen Slimme meter Storing en compensatie Zelf energie opwekken Afsluiten Afsluiting leidt tot zeer ernstige gezondheidsrisico's voor mij en/of mijn huisgenoten. Wat kan ik doen? Waar komt een Stedin-monteur voor langs? Wat noemt Stedin strenge vorst om afsluiting te voorkomen? Waarom sluit Stedin mijn elektriciteit en/of gas af? Stedin vraagt nooit aan de deur om geld Ik wil (tijdelijk) geen gebruik meer maken van de energie-aansluiting. Ik heb een brief ontvangen met als onderwerp ‘Voorkom afsluiting van elektriciteit’. Wat betekent dit? Er staat in de brief dat jullie tijdelijk afsluiten. Hoe lang duurt de onderbreking precies? Ik heb een brief ontvangen dat jullie gaan afsluiten, maar ik wil gas en/of elektriciteit houden.
+
+Question: Capaciteit
+Answer: Aansluiten en afsluiten Afsluiten Capaciteit Aansluitingen Meter en meterkast Offertes en aansluitingen Slimme meter Storing en compensatie Zelf energie opwekken Capaciteit Waar vind ik mijn capaciteit, EAN code en/of leverancier terug? Hoe kan ik zien wat de capaciteit van de aansluiting is? Ik vermoed dat de aangegeven capaciteit van de aansluiting niet klopt.
+
+Question: Aansluitingen
+Answer: Aansluiten en afsluiten Afsluiten Capaciteit Aansluitingen Meter en meterkast Offertes en aansluitingen Slimme meter Storing en compensatie Zelf energie opwekken Aansluitingen Ik wil elektrisch gaan koken. Heb ik dan een andere aansluiting nodig? Waarvoor is Stedin verantwoordelijk wat de aansluiting betreft? Moet ik me voorbereiden voor een aanpassing aan de aansluiting? Waar vind ik mijn capaciteit, EAN code en/of leverancier terug? Waarom kan ik geen 1x35A aansluiting meer aanvragen? Wat kost heraansluiting? Waarom voert DNWG mijn opdracht uit op Goeree-Overflakkee? Wanneer komen jullie langs voor de aanpassing van de aansluiting? Er staat geen datum in de brief. Ik wil elektriciteit en/of gas weer laten inschakelen. Wat moet ik doen? Hoe meld ik energiefraude zoals een hennepkwekerij? Ik wil (tijdelijk) geen gebruik meer maken van de energie-aansluiting. Hoe pas ik de registratie van mijn opwekinstallatie aan? Ik ben verhuisd. Hoe regel ik elektriciteit en/of gas? Wat moet ik regelen bij het overlijden van een familielid/bekende?
+
+Question: Afsluiting leidt tot zeer ernstige gezondheidsrisico's voor mij en/of mijn huisgenoten. Wat kan ik doen?
+Answer: Aansluiten en afsluiten Afsluiten Capaciteit Aansluitingen Meter en meterkast Offertes en aansluitingen Slimme meter Storing en compensatie Zelf energie opwekken Afsluiting leidt tot zeer ernstige gezondheidsrisico's voor mij en/of mijn huisgenoten. Wat kan ik doen? Dan stellen wij de afsluiting uit als u een betalingsachterstand heeft. Wij hebben dan wel een schriftelijke verklaring van een onafhankelijke arts nodig. Deze verklaring: Mag niet van uw behandelend arts zijn. Dit is vanwege de onafhankelijkheid van de arts. Moet aantonen dat de afsluiting voor u en/of uw huisgenoten zeer ernstige gezondheidsrisico’s heeft. Let op! Meldt uw energieleverancier dat uw leveringscontract beëindigd wordt vanwege een betalingsachterstand? Dan moet u de doktersverklaring zo snel mogelijk aan uw leverancier geven. Momenteel gelden landelijk afspraken over het minder snel afsluiten van energie . Afsluiten Heeft deze pagina u geholpen bij uw vraag? Ja Nee Bedankt voor uw feedback! Met uw input kunnen wij onze site verbeteren U heeft aangegeven dat de informatie op deze pagina u niet heeft geholpen Hoe kunnen wij u in de toekomst beter helpen? U kunt via dit scherm geen vragen stellen aan de klantenservice. Vul daarvoor ons contactformulier in. Verzenden Bedankt voor uw feedback! Met uw input kunnen wij onze site verbeteren Gerelateerde vragen Afsluiting leidt tot zeer ernstige gezondheidsrisico's voor mij en/of mijn huisgenoten. Wat kan ik doen? Waar komt een Stedin-monteur voor langs? Wat noemt Stedin strenge vorst om afsluiting te voorkomen?
+
+Question: Waar komt een Stedin-monteur voor langs?
+Answer: Aansluiten en afsluiten Afsluiten Capaciteit Aansluitingen Meter en meterkast Offertes en aansluitingen Slimme meter Storing en compensatie Zelf energie opwekken Waar komt een Stedin-monteur voor langs? Een Stedin-monteur kan om verschillende redenen bij u thuis langskomen. Bijvoorbeeld voor het oplossen van een storing die in ons net of in de energiemeter zit. Maar ook voor het wijzigen,&nbsp; aan- of afsluiten van de energieaansluiting of het plaatsen van een slimme energiemeter komt een monteur bij u langs. Bovendien controleert 1 keer per 3 jaar een Stedin-monteur de meetinstallatie bij u thuis en neemt dan gelijk de meterstanden op, ook als u al een slimme meter heeft. Afsluiten Heeft deze pagina u geholpen bij uw vraag? Ja Nee Bedankt voor uw feedback! Met uw input kunnen wij onze site verbeteren U heeft aangegeven dat de informatie op deze pagina u niet heeft geholpen Hoe kunnen wij u in de toekomst beter helpen? U kunt via dit scherm geen vragen stellen aan de klantenservice. Vul daarvoor ons contactformulier in. Verzenden Bedankt voor uw feedback! Met uw input kunnen wij onze site verbeteren Gerelateerde vragen Afsluiting leidt tot zeer ernstige gezondheidsrisico's voor mij en/of mijn huisgenoten. Wat kan ik doen? Waar komt een Stedin-monteur voor langs? Wat noemt Stedin strenge vorst om afsluiting te voorkomen?
+
+Question: Waarom sluit Stedin mijn elektriciteit en/of gas af?
+Answer: Aansluiten en afsluiten Afsluiten Capaciteit Aansluitingen Meter en meterkast Offertes en aansluitingen Slimme meter Storing en compensatie Zelf energie opwekken Waarom sluit Stedin mijn elektriciteit en/of gas af? Om dagelijks stroom en/of gas te blijven gebruiken, is het belangrijk dat u op tijd uw energierekeningen betaalt, een contract bij een energieleverancier hebt en fraude voorkomt. Voldoet u hier niet aan, dan moeten wij afsluiten . Momenteel gelden landelijk afspraken over het minder snel afsluiten van energie . Afsluiten Heeft deze pagina u geholpen bij uw vraag? Ja Nee Bedankt voor uw feedback! Met uw input kunnen wij onze site verbeteren U heeft aangegeven dat de informatie op deze pagina u niet heeft geholpen Hoe kunnen wij u in de toekomst beter helpen? U kunt via dit scherm geen vragen stellen aan de klantenservice. Vul daarvoor ons contactformulier in. Verzenden Bedankt voor uw feedback! Met uw input kunnen wij onze site verbeteren Gerelateerde vragen Afsluiting leidt tot zeer ernstige gezondheidsrisico's voor mij en/of mijn huisgenoten. Wat kan ik doen? Waar komt een Stedin-monteur voor langs? Wat noemt Stedin strenge vorst om afsluiting te voorkomen?
+
+Question: Stedin vraagt nooit aan de deur om geld
+Answer: Aansluiten en afsluiten Afsluiten Capaciteit Aansluitingen Meter en meterkast Offertes en aansluitingen Slimme meter Storing en compensatie Zelf energie opwekken Stedin vraagt nooit aan de deur om geld Helaas zijn soms oplichters actief die zich uitgeven voor Stedin-monteur. Deze oplichters vragen bijvoorbeeld geld om directe afsluiting te voorkomen of om een product af te nemen. Stedin vraagt nooit aan de deur om geld. Betaal niet en waarschuw de politie via 112. Afsluiten Heeft deze pagina u geholpen bij uw vraag? Ja Nee Bedankt voor uw feedback! Met uw input kunnen wij onze site verbeteren U heeft aangegeven dat de informatie op deze pagina u niet heeft geholpen Hoe kunnen wij u in de toekomst beter helpen? U kunt via dit scherm geen vragen stellen aan de klantenservice. Vul daarvoor ons contactformulier in. Verzenden Bedankt voor uw feedback! Met uw input kunnen wij onze site verbeteren Gerelateerde vragen Afsluiting leidt tot zeer ernstige gezondheidsrisico's voor mij en/of mijn huisgenoten. Wat kan ik doen? Waar komt een Stedin-monteur voor langs? Wat noemt Stedin strenge vorst om afsluiting te voorkomen?
+
+Question: Ik wil (tijdelijk) geen gebruik meer maken van de energie-aansluiting.
+Answer: Aansluiten en afsluiten Afsluiten Capaciteit Aansluitingen Meter en meterkast Offertes en aansluitingen Slimme meter Storing en compensatie Zelf energie opwekken Ik wil (tijdelijk) geen gebruik meer maken van de energie-aansluiting. Als u tijdelijk geen gas of elektriciteit nodig heeft, kunnen wij de aansluiting tijdelijk afsluiten (verzegelen). Daarna kiest u voor heraansluiting of het definitief verwijderen van de aansluiting. Zowel voor het afsluiten als het opnieuw aansluiten van stroom en/of gas brengen wij kosten in rekening. Bekijk onze tarieven . Let op! Vergeet niet om het contract met uw energieleverancier op te zeggen. Aansluitingen Heeft deze pagina u geholpen bij uw vraag? Ja Nee Bedankt voor uw feedback! Met uw input kunnen wij onze site verbeteren U heeft aangegeven dat de informatie op deze pagina u niet heeft geholpen Hoe kunnen wij u in de toekomst beter helpen? U kunt via dit scherm geen vragen stellen aan de klantenservice. Vul daarvoor ons contactformulier in. Verzenden Bedankt voor uw feedback! Met uw input kunnen wij onze site verbeteren Gerelateerde vragen Ik wil elektrisch gaan koken. Heb ik dan een andere aansluiting nodig? Waarvoor is Stedin verantwoordelijk wat de aansluiting betreft? Moet ik me voorbereiden voor een aanpassing aan de aansluiting?
+
+Question: Ik heb een brief ontvangen met als onderwerp ‘Voorkom afsluiting van elektriciteit’. Wat betekent dit?
+Answer: Aansluiten en afsluiten Afsluiten Capaciteit Aansluitingen Meter en meterkast Offertes en aansluitingen Slimme meter Storing en compensatie Zelf energie opwekken Ik heb een brief ontvangen met als onderwerp ‘Voorkom afsluiting van elektriciteit’. Wat betekent dit? Deze brief&nbsp;betekent dat&nbsp;wij de energie-aansluiting in uw huis gaan afsluiten. De reden is dat bij ons geen leveringsovereenkomst met een energieleverancier bekend is,&nbsp;of dat er een betaalachterstand is. Lees hoe u afsluiting kunt voorkomen . Momenteel gelden landelijk afspraken over het minder snel afsluiten van energie . Afsluiten Heeft deze pagina u geholpen bij uw vraag? Ja Nee Bedankt voor uw feedback! Met uw input kunnen wij onze site verbeteren U heeft aangegeven dat de informatie op deze pagina u niet heeft geholpen Hoe kunnen wij u in de toekomst beter helpen? U kunt via dit scherm geen vragen stellen aan de klantenservice. Vul daarvoor ons contactformulier in. Verzenden Bedankt voor uw feedback! Met uw input kunnen wij onze site verbeteren Gerelateerde vragen De buren hebben een brief gekregen dat ze tijdelijk geen elektriciteit en/of gas hebben tijdens werkzaamheden maar ik niet. Er staat een verkeerd rekeningnummer op de factuur. Organiseren jullie noodstroom voor mij?
+
+Question: Er staat in de brief dat jullie tijdelijk afsluiten. Hoe lang duurt de onderbreking precies?
+Answer: Aansluiten en afsluiten Afsluiten Capaciteit Aansluitingen Meter en meterkast Offertes en aansluitingen Slimme meter Storing en compensatie Zelf energie opwekken Er staat in de brief dat jullie tijdelijk afsluiten. Hoe lang duurt de onderbreking precies? Dat kunnen we van tevoren niet precies zeggen. In de brief staat een bepaalde periode waarin we aan het net werken. Wij doen ons uiterste best om de werkzaamheden zo kort mogelijk te laten duren. Wij hopen op uw begrip. Afsluiten Heeft deze pagina u geholpen bij uw vraag? Ja Nee Bedankt voor uw feedback! Met uw input kunnen wij onze site verbeteren U heeft aangegeven dat de informatie op deze pagina u niet heeft geholpen Hoe kunnen wij u in de toekomst beter helpen? U kunt via dit scherm geen vragen stellen aan de klantenservice. Vul daarvoor ons contactformulier in. Verzenden Bedankt voor uw feedback! Met uw input kunnen wij onze site verbeteren Gerelateerde vragen De buren hebben een brief gekregen dat ze tijdelijk geen elektriciteit en/of gas hebben tijdens werkzaamheden maar ik niet. Er staat een verkeerd rekeningnummer op de factuur. Organiseren jullie noodstroom voor mij?
+
+Question: Waar vind ik mijn capaciteit, EAN code en/of leverancier terug?
+Answer: Aansluiten en afsluiten Afsluiten Capaciteit Aansluitingen Meter en meterkast Offertes en aansluitingen Slimme meter Storing en compensatie Zelf energie opwekken Waar vind ik mijn capaciteit, EAN code en/of leverancier terug? Deze gegevens vindt u terug in Mijn Stedin . U kunt een account aanmaken met uw meternummer. Daarna ontvangt u een brief met een eenmalige persoonlijke inlogcode. Deze code heeft u nodig om uw account te activeren. Aansluitingen Heeft deze pagina u geholpen bij uw vraag? Ja Nee Bedankt voor uw feedback! Met uw input kunnen wij onze site verbeteren U heeft aangegeven dat de informatie op deze pagina u niet heeft geholpen Hoe kunnen wij u in de toekomst beter helpen? U kunt via dit scherm geen vragen stellen aan de klantenservice. Vul daarvoor ons contactformulier in. Verzenden Bedankt voor uw feedback! Met uw input kunnen wij onze site verbeteren Gerelateerde vragen Ik wil elektrisch gaan koken. Heb ik dan een andere aansluiting nodig? Waarvoor is Stedin verantwoordelijk wat de aansluiting betreft? Moet ik me voorbereiden voor een aanpassing aan de aansluiting?
+
+Question: Hoe kan ik zien wat de capaciteit van de aansluiting is?
+Answer: Aansluiten en afsluiten Afsluiten Capaciteit Aansluitingen Meter en meterkast Offertes en aansluitingen Slimme meter Storing en compensatie Zelf energie opwekken Hoe kan ik zien wat de capaciteit van de aansluiting is? De aansluiting is de verbinding tussen ons energienet en uw meterkast. De maandelijkse kosten die u hiervoor betaalt, hangen af van de capaciteit van uw aansluiting (aansluitwaarde). De capaciteit van uw elektriciteits- en gasaansluiting kunt u hier opvragen .&nbsp;Voor gas staat de capaciteit ook op de voorkant van de meter. Bijvoorbeeld G4, G6, G10. Capaciteit opvragen Capaciteit Heeft deze pagina u geholpen bij uw vraag? Ja Nee Bedankt voor uw feedback! Met uw input kunnen wij onze site verbeteren U heeft aangegeven dat de informatie op deze pagina u niet heeft geholpen Hoe kunnen wij u in de toekomst beter helpen? U kunt via dit scherm geen vragen stellen aan de klantenservice. Vul daarvoor ons contactformulier in. Verzenden Bedankt voor uw feedback! Met uw input kunnen wij onze site verbeteren Gerelateerde vragen Waar vind ik mijn capaciteit, EAN code en/of leverancier terug? Hoe kan ik zien wat de capaciteit van de aansluiting is? Ik vermoed dat de aangegeven capaciteit van de aansluiting niet klopt.
+
+Question: Ik vermoed dat de aangegeven capaciteit van de aansluiting niet klopt.
+Answer: Aansluiten en afsluiten Afsluiten Capaciteit Aansluitingen Meter en meterkast Offertes en aansluitingen Slimme meter Storing en compensatie Zelf energie opwekken Ik vermoed dat de aangegeven capaciteit van de aansluiting niet klopt. De capaciteit of aansluitwaarde van uw aansluiting geeft aan hoeveel elektriciteit of gas u tegelijk kunt gebruiken. In Mijn Stedin ziet u de capaciteit van uw aansluiting. Vermoedt u dat de aangegeven capaciteit niet klopt? Neem dan contact op met onze klantenservice . Capaciteit Heeft deze pagina u geholpen bij uw vraag? Ja Nee Bedankt voor uw feedback! Met uw input kunnen wij onze site verbeteren U heeft aangegeven dat de informatie op deze pagina u niet heeft geholpen Hoe kunnen wij u in de toekomst beter helpen? U kunt via dit scherm geen vragen stellen aan de klantenservice. Vul daarvoor ons contactformulier in. Verzenden Bedankt voor uw feedback! Met uw input kunnen wij onze site verbeteren Gerelateerde vragen Waar vind ik mijn capaciteit, EAN code en/of leverancier terug? Hoe kan ik zien wat de capaciteit van de aansluiting is? Ik vermoed dat de aangegeven capaciteit van de aansluiting niet klopt.
+
+Question: Ik wil elektrisch gaan koken. Heb ik dan een andere aansluiting nodig?
+Answer: Aansluiten en afsluiten Afsluiten Capaciteit Aansluitingen Meter en meterkast Offertes en aansluitingen Slimme meter Storing en compensatie Zelf energie opwekken Ik wil elektrisch gaan koken. Heb ik dan een andere aansluiting nodig? Elektrisch koken, zoals inductiekoken, is een alternatief voor het koken op gas. Houd er wel rekening mee dat u, als u overstapt op elektrisch koken, meer elektriciteit gaat gebruiken en uw aansluiting hiervoor geschikt moet zijn. Om te voorkomen dat de stoppen doorslaan, heeft u voor de meeste kookplaten een aangepaste of moderne meterkast nodig met een 3-fasen aansluiting (een zogenaamde krachtstroomaansluiting). Ook moet in de keuken dan een krachtstroomstopcontact geplaatst zijn voor de vijfpolige stekker van de kookplaat. De capaciteit van de aansluiting die u nu heeft, vindt u terug in Mijn Stedin . In ons stappenplan leest u hoe u uw aansluiting verzwaart .&nbsp;Let op: bij een zwaardere aansluiting betaalt u ook meer voor de periodieke aansluit- en transportvergoedingen. U betaalt deze kosten via uw energieleverancier. Aansluitingen Heeft deze pagina u geholpen bij uw vraag? Ja Nee Bedankt voor uw feedback! Met uw input kunnen wij onze site verbeteren U heeft aangegeven dat de informatie op deze pagina u niet heeft geholpen Hoe kunnen wij u in de toekomst beter helpen? U kunt via dit scherm geen vragen stellen aan de klantenservice. Vul daarvoor ons contactformulier in. Verzenden Bedankt voor uw feedback! Met uw input kunnen wij onze site verbeteren Gerelateerde vragen Ik wil elektrisch gaan koken. Heb ik dan een andere aansluiting nodig? Waarvoor is Stedin verantwoordelijk wat de aansluiting betreft? Moet ik me voorbereiden voor een aanpassing aan de aansluiting?
+
+Question: Waarvoor is Stedin verantwoordelijk wat de aansluiting betreft?
+Answer: Aansluiten en afsluiten Afsluiten Capaciteit Aansluitingen Meter en meterkast Offertes en aansluitingen Slimme meter Storing en compensatie Zelf energie opwekken Waarvoor is Stedin verantwoordelijk wat de aansluiting betreft? GROOTVERBRUIK Stedin is verantwoordelijk voor de installatie tot de meter(s) Hiermee bedoelen we het plaatsen en onderhouden van: de leidingen en kabels waarmee u op ons net bent aangesloten. de hoofdaansluitkast (HAK-kast). KLEINVERBRUIK Stedin is verantwoordelijk voor de installatie tot en met de meter(s) Hiermee bedoelen we het plaatsen en onderhouden van: de leidingen en kabels waarmee u op ons net bent aangesloten. de elektriciteits- en eventuele gasmeter in uw meterkast. Deze meters zijn eigendom van Stedin. de hoofdaansluitkast (HAK-kast). De eigenaar van een pand is verantwoordelijk voor het onderhouden van de meterkast Hiermee bedoelen we het (laten) plaatsen en onderhouden van: de bouwkundige voorzieningen. Dit is de ombouw van de meter-, bouwkast of meterruimte. de groepenkast (stoppenkast) inclusief de hoofd- en aardlekschakelaar. Bekijk hoe de meterkast in elkaar zit. Aansluitingen Heeft deze pagina u geholpen bij uw vraag? Ja Nee Bedankt voor uw feedback! Met uw input kunnen wij onze site verbeteren U heeft aangegeven dat de informatie op deze pagina u niet heeft geholpen Hoe kunnen wij u in de toekomst beter helpen? U kunt via dit scherm geen vragen stellen aan de klantenservice. Vul daarvoor ons contactformulier in. Verzenden Bedankt voor uw feedback! Met uw input kunnen wij onze site verbeteren Gerelateerde vragen Ik wil elektrisch gaan koken. Heb ik dan een andere aansluiting nodig? Waarvoor is Stedin verantwoordelijk wat de aansluiting betreft? Moet ik me voorbereiden voor een aanpassing aan de aansluiting?
+
+Question: Moet ik me voorbereiden voor een aanpassing aan de aansluiting?
+Answer: Aansluiten en afsluiten Afsluiten Capaciteit Aansluitingen Meter en meterkast Offertes en aansluitingen Slimme meter Storing en compensatie Zelf energie opwekken Moet ik me voorbereiden voor een aanpassing aan de aansluiting? Het helpt ons erg als u ervoor zorgt dat de meterkast toegankelijk is. Dan kunnen we er makkelijk bij en kunnen we snel werken. Ook is het natuurlijk belangrijk dat u thuis bent op de dag van de werkzaamheden. Aansluitingen Heeft deze pagina u geholpen bij uw vraag? Ja Nee Bedankt voor uw feedback! Met uw input kunnen wij onze site verbeteren U heeft aangegeven dat de informatie op deze pagina u niet heeft geholpen Hoe kunnen wij u in de toekomst beter helpen? U kunt via dit scherm geen vragen stellen aan de klantenservice. Vul daarvoor ons contactformulier in. Verzenden Bedankt voor uw feedback! Met uw input kunnen wij onze site verbeteren Gerelateerde vragen De buren hebben een brief gekregen dat ze tijdelijk geen elektriciteit en/of gas hebben tijdens werkzaamheden maar ik niet. Er staat een verkeerd rekeningnummer op de factuur. Organiseren jullie noodstroom voor mij?
+
+Question: Waar vind ik mijn capaciteit, EAN code en/of leverancier terug?
+Answer: Aansluiten en afsluiten Afsluiten Capaciteit Aansluitingen Meter en meterkast Offertes en aansluitingen Slimme meter Storing en compensatie Zelf energie opwekken Waar vind ik mijn capaciteit, EAN code en/of leverancier terug? Deze gegevens vindt u terug in Mijn Stedin . U kunt een account aanmaken met uw meternummer. Daarna ontvangt u een brief met een eenmalige persoonlijke inlogcode. Deze code heeft u nodig om uw account te activeren. Aansluitingen Heeft deze pagina u geholpen bij uw vraag? Ja Nee Bedankt voor uw feedback! Met uw input kunnen wij onze site verbeteren U heeft aangegeven dat de informatie op deze pagina u niet heeft geholpen Hoe kunnen wij u in de toekomst beter helpen? U kunt via dit scherm geen vragen stellen aan de klantenservice. Vul daarvoor ons contactformulier in. Verzenden Bedankt voor uw feedback! Met uw input kunnen wij onze site verbeteren Gerelateerde vragen Ik wil elektrisch gaan koken. Heb ik dan een andere aansluiting nodig? Waarvoor is Stedin verantwoordelijk wat de aansluiting betreft? Moet ik me voorbereiden voor een aanpassing aan de aansluiting?
+
+Question: Waarom kan ik geen 1x35A aansluiting meer aanvragen?
+Answer: Aansluiten en afsluiten Afsluiten Capaciteit Aansluitingen Meter en meterkast Offertes en aansluitingen Slimme meter Storing en compensatie Zelf energie opwekken Waarom kan ik geen 1x35A aansluiting meer aanvragen? Het klopt dat wij deze aansluiting niet meer aanbieden als nieuwe aansluiting. Vanwege de energietransitie (de uitfasering van gas, de toename van zonnepanelen en laadpalen aan huis) wordt er meer elektriciteit via de aansluiting getransporteerd. Dit vraagt in bijna alle gevallen een driefasenaansluiting. Klanten die een 1x35A aansluiting hebben, kunnen deze gewoon behouden. Bij een verplaatsing of een verzwaring van de aansluiting bieden wij alleen nog een driefaseaansluiting. Aansluitingen Heeft deze pagina u geholpen bij uw vraag? Ja Nee Bedankt voor uw feedback! Met uw input kunnen wij onze site verbeteren U heeft aangegeven dat de informatie op deze pagina u niet heeft geholpen Hoe kunnen wij u in de toekomst beter helpen? U kunt via dit scherm geen vragen stellen aan de klantenservice. Vul daarvoor ons contactformulier in. Verzenden Bedankt voor uw feedback! Met uw input kunnen wij onze site verbeteren Gerelateerde vragen Ik wil elektrisch gaan koken. Heb ik dan een andere aansluiting nodig? Waarvoor is Stedin verantwoordelijk wat de aansluiting betreft? Moet ik me voorbereiden voor een aanpassing aan de aansluiting?
+
+Question: Wat kost heraansluiting?
+Answer: Aansluiten en afsluiten Afsluiten Capaciteit Aansluitingen Meter en meterkast Offertes en aansluitingen Slimme meter Storing en compensatie Zelf energie opwekken Wat kost heraansluiting? Zie Overige tarieven op onze tarievenpagina . Aansluitingen Heeft deze pagina u geholpen bij uw vraag? Ja Nee Bedankt voor uw feedback! Met uw input kunnen wij onze site verbeteren U heeft aangegeven dat de informatie op deze pagina u niet heeft geholpen Hoe kunnen wij u in de toekomst beter helpen? U kunt via dit scherm geen vragen stellen aan de klantenservice. Vul daarvoor ons contactformulier in. Verzenden Bedankt voor uw feedback! Met uw input kunnen wij onze site verbeteren Gerelateerde vragen Ik wil elektrisch gaan koken. Heb ik dan een andere aansluiting nodig? Waarvoor is Stedin verantwoordelijk wat de aansluiting betreft? Moet ik me voorbereiden voor een aanpassing aan de aansluiting?
+
+Question: Waarom voert DNWG mijn opdracht uit op Goeree-Overflakkee?
+Answer: Aansluiten en afsluiten Meter en meterkast Offertes en aansluitingen Aansluiting Uitvoering Aanvragen Offertes Slimme meter Storing en compensatie Zelf energie opwekken Waarom voert DNWG mijn opdracht uit op Goeree-Overflakkee? Stedin is de beheerder van het energienet op Goeree-Overflakkee. Alle werkzaamheden rondom aanleg, wijziging en verwijdering van aansluitingen op Goeree-Overflakkee worden uitgevoerd door DNWG . Heeft u een vraag over uw aansluiting? Neem dan contact op met DNWG via telefoonnummer 0113 - 74 11 00. Voor andere vragen kunt u contact opnemen met Stedin . Uitvoering Heeft deze pagina u geholpen bij uw vraag? Ja Nee Bedankt voor uw feedback! Met uw input kunnen wij onze site verbeteren U heeft aangegeven dat de informatie op deze pagina u niet heeft geholpen Hoe kunnen wij u in de toekomst beter helpen? U kunt via dit scherm geen vragen stellen aan de klantenservice. Vul daarvoor ons contactformulier in. Verzenden Bedankt voor uw feedback! Met uw input kunnen wij onze site verbeteren Gerelateerde vragen Aan welke eisen moet mijn meterkast voldoen? Hoe kan ik een klacht indienen? Wat betekent het schrappen van de bouwvrijstelling voor stikstof voor mijn opdracht?
+
+Question: Wanneer komen jullie langs voor de aanpassing van de aansluiting? Er staat geen datum in de brief.
+Answer: Aansluiten en afsluiten Afsluiten Capaciteit Aansluitingen Meter en meterkast Offertes en aansluitingen Slimme meter Storing en compensatie Zelf energie opwekken Wanneer komen jullie langs voor de aanpassing van de aansluiting? Er staat geen datum in de brief. We nemen binnenkort contact met u op. In de brief staat wanneer dat is. Aansluitingen Heeft deze pagina u geholpen bij uw vraag? Ja Nee Bedankt voor uw feedback! Met uw input kunnen wij onze site verbeteren U heeft aangegeven dat de informatie op deze pagina u niet heeft geholpen Hoe kunnen wij u in de toekomst beter helpen? U kunt via dit scherm geen vragen stellen aan de klantenservice. Vul daarvoor ons contactformulier in. Verzenden Bedankt voor uw feedback! Met uw input kunnen wij onze site verbeteren Gerelateerde vragen De buren hebben een brief gekregen dat ze tijdelijk geen elektriciteit en/of gas hebben tijdens werkzaamheden maar ik niet. Er staat een verkeerd rekeningnummer op de factuur. Organiseren jullie noodstroom voor mij?
+
+Question: Ik wil elektriciteit en/of gas weer laten inschakelen. Wat moet ik doen?
+Answer: Aansluiten en afsluiten Afsluiten Capaciteit Aansluitingen Meter en meterkast Offertes en aansluitingen Slimme meter Storing en compensatie Zelf energie opwekken Ik wil elektriciteit en/of gas weer laten inschakelen. Wat moet ik doen? Als u bent afgesloten en weer gebruik wilt maken van energie moet u een aantal stappen doorlopen. Dat duurt enkele dagen. Belangrijk dus om snel in actie te komen. Bekijk wat u hiervoor moet regelen . Wij brengen hiervoor wel kosten&nbsp;in rekening, zie onder 'overige tarieven' de kosten voor af- en heraansluiten. Aansluitingen Heeft deze pagina u geholpen bij uw vraag? Ja Nee Bedankt voor uw feedback! Met uw input kunnen wij onze site verbeteren U heeft aangegeven dat de informatie op deze pagina u niet heeft geholpen Hoe kunnen wij u in de toekomst beter helpen? U kunt via dit scherm geen vragen stellen aan de klantenservice. Vul daarvoor ons contactformulier in. Verzenden Bedankt voor uw feedback! Met uw input kunnen wij onze site verbeteren Gerelateerde vragen Ik wil elektrisch gaan koken. Heb ik dan een andere aansluiting nodig? Waarvoor is Stedin verantwoordelijk wat de aansluiting betreft? Moet ik me voorbereiden voor een aanpassing aan de aansluiting?
+
+Question: Hoe meld ik energiefraude zoals een hennepkwekerij?
+Answer: Aansluiten en afsluiten Afsluiten Capaciteit Aansluitingen Meter en meterkast Offertes en aansluitingen Slimme meter Storing en compensatie Zelf energie opwekken Hoe meld ik energiefraude zoals een hennepkwekerij? Vermoedt u dat iemand illegaal stroom aftapt? Of dat iemand fraude pleegt met de energiemeter? Meld dit dan direct! Energiefraude kan leiden tot erg gevaarlijke situaties, zoals brand. Door energiefraude te melden, helpt u mee aan een veilige omgeving.&nbsp;Bel de politie om energiefraude te melden via 0900-8844 of via Meld Misdaad Anoniem (0800-7000). U kunt ook een melding bij ons maken . Aansluitingen Heeft deze pagina u geholpen bij uw vraag? Ja Nee Bedankt voor uw feedback! Met uw input kunnen wij onze site verbeteren U heeft aangegeven dat de informatie op deze pagina u niet heeft geholpen Hoe kunnen wij u in de toekomst beter helpen? U kunt via dit scherm geen vragen stellen aan de klantenservice. Vul daarvoor ons contactformulier in. Verzenden Bedankt voor uw feedback! Met uw input kunnen wij onze site verbeteren Gerelateerde vragen Ik wil elektrisch gaan koken. Heb ik dan een andere aansluiting nodig? Waarvoor is Stedin verantwoordelijk wat de aansluiting betreft? Moet ik me voorbereiden voor een aanpassing aan de aansluiting?
+
+Question: Ik wil (tijdelijk) geen gebruik meer maken van de energie-aansluiting.
+Answer: Aansluiten en afsluiten Afsluiten Capaciteit Aansluitingen Meter en meterkast Offertes en aansluitingen Slimme meter Storing en compensatie Zelf energie opwekken Ik wil (tijdelijk) geen gebruik meer maken van de energie-aansluiting. Als u tijdelijk geen gas of elektriciteit nodig heeft, kunnen wij de aansluiting tijdelijk afsluiten (verzegelen). Daarna kiest u voor heraansluiting of het definitief verwijderen van de aansluiting. Zowel voor het afsluiten als het opnieuw aansluiten van stroom en/of gas brengen wij kosten in rekening. Bekijk onze tarieven . Let op! Vergeet niet om het contract met uw energieleverancier op te zeggen. Aansluitingen Heeft deze pagina u geholpen bij uw vraag? Ja Nee Bedankt voor uw feedback! Met uw input kunnen wij onze site verbeteren U heeft aangegeven dat de informatie op deze pagina u niet heeft geholpen Hoe kunnen wij u in de toekomst beter helpen? U kunt via dit scherm geen vragen stellen aan de klantenservice. Vul daarvoor ons contactformulier in. Verzenden Bedankt voor uw feedback! Met uw input kunnen wij onze site verbeteren Gerelateerde vragen Ik wil elektrisch gaan koken. Heb ik dan een andere aansluiting nodig? Waarvoor is Stedin verantwoordelijk wat de aansluiting betreft? Moet ik me voorbereiden voor een aanpassing aan de aansluiting?
+
+Question: Hoe pas ik de registratie van mijn opwekinstallatie aan?
+Answer: Aansluiten en afsluiten Afsluiten Capaciteit Aansluitingen Meter en meterkast Offertes en aansluitingen Slimme meter Storing en compensatie Zelf energie opwekken Hoe pas ik de registratie van mijn opwekinstallatie aan? Bij vervanging of beëindiging kunt u de oude installatie eerst afmelden bij energieleveren.nl en vervolgens de nieuwe installatie aanmelden. Bij uitbreiding op hetzelfde adres hoeft u alleen de nieuwe installatie aan te melden. De huidige installatie blijft eveneens geregistreerd. Moeten de gegevens van de bestaande installatie aangevuld of gewijzigd worden? Ook dit doet u op energieleveren.nl. Aansluitingen Heeft deze pagina u geholpen bij uw vraag? Ja Nee Bedankt voor uw feedback! Met uw input kunnen wij onze site verbeteren U heeft aangegeven dat de informatie op deze pagina u niet heeft geholpen Hoe kunnen wij u in de toekomst beter helpen? U kunt via dit scherm geen vragen stellen aan de klantenservice. Vul daarvoor ons contactformulier in. Verzenden Bedankt voor uw feedback! Met uw input kunnen wij onze site verbeteren Gerelateerde vragen Hoe pas ik de registratie van mijn opwekinstallatie aan? Ik weet niet zeker of ik over de juiste gegevens van de omvormer en de zonnepanelen beschik. Hoe kom ik achter de juiste gegevens? Mijn meters (meternummers) worden niet herkend tijdens het registeren van mijn installatie. Wat moet ik doen?
+
+Question: Ik ben verhuisd. Hoe regel ik elektriciteit en/of gas?
+Answer: Aansluiten en afsluiten Afsluiten Capaciteit Aansluitingen Meter en meterkast Offertes en aansluitingen Slimme meter Storing en compensatie Zelf energie opwekken Ik ben verhuisd. Hoe regel ik elektriciteit en/of gas? Dat u geen stroom en/of gas heeft kan verschillende oorzaken hebben: Uw vorige bewoner heeft de hoofdkraan van de gasaansluiting dichtgedraaid en de hoofdschakelaar uitgezet in uw stoppenkast. Lees de uitleg over de meterkast . U heeft geen gas- en/of elektriciteitsaansluiting. Vraag een nieuwe aansluiting aan. U heeft geen energiemeter. Vraag deze aan bij onze klantenservice . Let op! Hier zijn eenmalige kosten aan verbonden. Er is een storing. Bekijk actuele storingen . Is geen van het bovenstaande bij u het geval? Laat een erkend installateur dan naar de installatie kijken. Vindt u het lastig om te bepalen wat er aan de hand is? Ook dan is het verstandig om een erkend installateur naar de installatie te laten kijken. U kunt ook contact opnemen met onze klantenservice . Let op! Om weer energie te krijgen, heeft u een contract met een energieleverancier nodig. Vind een energieleverancier via acm.nl . Aansluitingen Heeft deze pagina u geholpen bij uw vraag? Ja Nee Bedankt voor uw feedback! Met uw input kunnen wij onze site verbeteren U heeft aangegeven dat de informatie op deze pagina u niet heeft geholpen Hoe kunnen wij u in de toekomst beter helpen? U kunt via dit scherm geen vragen stellen aan de klantenservice. Vul daarvoor ons contactformulier in. Verzenden Bedankt voor uw feedback! Met uw input kunnen wij onze site verbeteren Gerelateerde vragen Ik wil elektrisch gaan koken. Heb ik dan een andere aansluiting nodig? Waarvoor is Stedin verantwoordelijk wat de aansluiting betreft? Moet ik me voorbereiden voor een aanpassing aan de aansluiting?
+
+Question: Wat moet ik regelen bij het overlijden van een familielid/bekende?
+Answer: Aansluiten en afsluiten Afsluiten Capaciteit Aansluitingen Meter en meterkast Offertes en aansluitingen Slimme meter Storing en compensatie Zelf energie opwekken Wat moet ik regelen bij het overlijden van een familielid/bekende? Het is belangrijk dat u het contract, dat de overledene met de energieleverancier had, opzegt. Dit doet u direct bij de energieleverancier. Deze geeft de wijziging dan door aan Stedin. Blijft de huur- of koopwoning (voorlopig) binnen de familie? Dan sluit de nieuwe eigenaar of hoofdbewoner  een nieuw contract af met de energieleverancier voor de aansluitende periode. Wordt de huur direct opgezegd of de woning meteen verkocht? Dan is de nieuwe bewoner verantwoordelijk voor het afsluiten van zijn eigen nieuwe energiecontract. Aansluitingen Heeft deze pagina u geholpen bij uw vraag? Ja Nee Bedankt voor uw feedback! Met uw input kunnen wij onze site verbeteren U heeft aangegeven dat de informatie op deze pagina u niet heeft geholpen Hoe kunnen wij u in de toekomst beter helpen? U kunt via dit scherm geen vragen stellen aan de klantenservice. Vul daarvoor ons contactformulier in. Verzenden Bedankt voor uw feedback! Met uw input kunnen wij onze site verbeteren Gerelateerde vragen Ik wil elektrisch gaan koken. Heb ik dan een andere aansluiting nodig? Waarvoor is Stedin verantwoordelijk wat de aansluiting betreft? Moet ik me voorbereiden voor een aanpassing aan de aansluiting?
+</code></pre>
+</div>
+<div class="cell-output cell-output-error">
+<pre><code>HTTPError: 400 Client Error: Bad Request for url: https://twitter.com/stedin</code></pre>
+</div>
+</div>
+
+</main>
+<!-- /main column -->
+<script id="quarto-html-after-body" type="application/javascript">
+window.document.addEventListener("DOMContentLoaded", function (event) {
+  const toggleBodyColorMode = (bsSheetEl) => {
+    const mode = bsSheetEl.getAttribute("data-mode");
+    const bodyEl = window.document.querySelector("body");
+    if (mode === "dark") {
+      bodyEl.classList.add("quarto-dark");
+      bodyEl.classList.remove("quarto-light");
+    } else {
+      bodyEl.classList.add("quarto-light");
+      bodyEl.classList.remove("quarto-dark");
+    }
+  }
+  const toggleBodyColorPrimary = () => {
+    const bsSheetEl = window.document.querySelector("link#quarto-bootstrap");
+    if (bsSheetEl) {
+      toggleBodyColorMode(bsSheetEl);
+    }
+  }
+  toggleBodyColorPrimary();  
+  const icon = "";
+  const anchorJS = new window.AnchorJS();
+  anchorJS.options = {
+    placement: 'right',
+    icon: icon
+  };
+  anchorJS.add('.anchored');
+  const isCodeAnnotation = (el) => {
+    for (const clz of el.classList) {
+      if (clz.startsWith('code-annotation-')) {                     
+        return true;
+      }
+    }
+    return false;
+  }
+  const clipboard = new window.ClipboardJS('.code-copy-button', {
+    text: function(trigger) {
+      const codeEl = trigger.previousElementSibling.cloneNode(true);
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+  });
+  clipboard.on('success', function(e) {
+    // button target
+    const button = e.trigger;
+    // don't keep focus
+    button.blur();
+    // flash "checked"
+    button.classList.add('code-copy-button-checked');
+    var currentTitle = button.getAttribute("title");
+    button.setAttribute("title", "Copied!");
+    let tooltip;
+    if (window.bootstrap) {
+      button.setAttribute("data-bs-toggle", "tooltip");
+      button.setAttribute("data-bs-placement", "left");
+      button.setAttribute("data-bs-title", "Copied!");
+      tooltip = new bootstrap.Tooltip(button, 
+        { trigger: "manual", 
+          customClass: "code-copy-button-tooltip",
+          offset: [0, -8]});
+      tooltip.show();    
+    }
+    setTimeout(function() {
+      if (tooltip) {
+        tooltip.hide();
+        button.removeAttribute("data-bs-title");
+        button.removeAttribute("data-bs-toggle");
+        button.removeAttribute("data-bs-placement");
+      }
+      button.setAttribute("title", currentTitle);
+      button.classList.remove('code-copy-button-checked');
+    }, 1000);
+    // clear code selection
+    e.clearSelection();
+  });
+    var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+    var mailtoRegex = new RegExp(/^mailto:/);
+      var filterRegex = new RegExp('/' + window.location.host + '/');
+    var isInternal = (href) => {
+        return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+    }
+    // Inspect non-navigation links and adorn them if external
+ 	var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool)');
+    for (var i=0; i<links.length; i++) {
+      const link = links[i];
+      if (!isInternal(link.href)) {
+        // undo the damage that might have been done by quarto-nav.js in the case of
+        // links that we want to consider external
+        if (link.dataset.originalHref !== undefined) {
+          link.href = link.dataset.originalHref;
+        }
+      }
+    }
+  function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+    const config = {
+      allowHTML: true,
+      maxWidth: 500,
+      delay: 100,
+      arrow: false,
+      appendTo: function(el) {
+          return el.parentElement;
+      },
+      interactive: true,
+      interactiveBorder: 10,
+      theme: 'quarto',
+      placement: 'bottom-start',
+    };
+    if (contentFn) {
+      config.content = contentFn;
+    }
+    if (onTriggerFn) {
+      config.onTrigger = onTriggerFn;
+    }
+    if (onUntriggerFn) {
+      config.onUntrigger = onUntriggerFn;
+    }
+    window.tippy(el, config); 
+  }
+  const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+  for (var i=0; i<noterefs.length; i++) {
+    const ref = noterefs[i];
+    tippyHover(ref, function() {
+      // use id or data attribute instead here
+      let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+      try { href = new URL(href).hash; } catch {}
+      const id = href.replace(/^#\/?/, "");
+      const note = window.document.getElementById(id);
+      if (note) {
+        return note.innerHTML;
+      } else {
+        return "";
+      }
+    });
+  }
+  const xrefs = window.document.querySelectorAll('a.quarto-xref');
+  const processXRef = (id, note) => {
+    // Strip column container classes
+    const stripColumnClz = (el) => {
+      el.classList.remove("page-full", "page-columns");
+      if (el.children) {
+        for (const child of el.children) {
+          stripColumnClz(child);
+        }
+      }
+    }
+    stripColumnClz(note)
+    if (id === null || id.startsWith('sec-')) {
+      // Special case sections, only their first couple elements
+      const container = document.createElement("div");
+      if (note.children && note.children.length > 2) {
+        container.appendChild(note.children[0].cloneNode(true));
+        for (let i = 1; i < note.children.length; i++) {
+          const child = note.children[i];
+          if (child.tagName === "P" && child.innerText === "") {
+            continue;
+          } else {
+            container.appendChild(child.cloneNode(true));
+            break;
+          }
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(container);
+        }
+        return container.innerHTML
+      } else {
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        return note.innerHTML;
+      }
+    } else {
+      // Remove any anchor links if they are present
+      const anchorLink = note.querySelector('a.anchorjs-link');
+      if (anchorLink) {
+        anchorLink.remove();
+      }
+      if (window.Quarto?.typesetMath) {
+        window.Quarto.typesetMath(note);
+      }
+      // TODO in 1.5, we should make sure this works without a callout special case
+      if (note.classList.contains("callout")) {
+        return note.outerHTML;
+      } else {
+        return note.innerHTML;
+      }
+    }
+  }
+  for (var i=0; i<xrefs.length; i++) {
+    const xref = xrefs[i];
+    tippyHover(xref, undefined, function(instance) {
+      instance.disable();
+      let url = xref.getAttribute('href');
+      let hash = undefined; 
+      if (url.startsWith('#')) {
+        hash = url;
+      } else {
+        try { hash = new URL(url).hash; } catch {}
+      }
+      if (hash) {
+        const id = hash.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note !== null) {
+          try {
+            const html = processXRef(id, note.cloneNode(true));
+            instance.setContent(html);
+          } finally {
+            instance.enable();
+            instance.show();
+          }
+        } else {
+          // See if we can fetch this
+          fetch(url.split('#')[0])
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.getElementById(id);
+            if (note !== null) {
+              const html = processXRef(id, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      } else {
+        // See if we can fetch a full url (with no hash to target)
+        // This is a special case and we should probably do some content thinning / targeting
+        fetch(url)
+        .then(res => res.text())
+        .then(html => {
+          const parser = new DOMParser();
+          const htmlDoc = parser.parseFromString(html, "text/html");
+          const note = htmlDoc.querySelector('main.content');
+          if (note !== null) {
+            // This should only happen for chapter cross references
+            // (since there is no id in the URL)
+            // remove the first header
+            if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+              note.children[0].remove();
+            }
+            const html = processXRef(null, note);
+            instance.setContent(html);
+          } 
+        }).finally(() => {
+          instance.enable();
+          instance.show();
+        });
+      }
+    }, function(instance) {
+    });
+  }
+      let selectedAnnoteEl;
+      const selectorForAnnotation = ( cell, annotation) => {
+        let cellAttr = 'data-code-cell="' + cell + '"';
+        let lineAttr = 'data-code-annotation="' +  annotation + '"';
+        const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+        return selector;
+      }
+      const selectCodeLines = (annoteEl) => {
+        const doc = window.document;
+        const targetCell = annoteEl.getAttribute("data-target-cell");
+        const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+        const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+        const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+        const lineIds = lines.map((line) => {
+          return targetCell + "-" + line;
+        })
+        let top = null;
+        let height = null;
+        let parent = null;
+        if (lineIds.length > 0) {
+            //compute the position of the single el (top and bottom and make a div)
+            const el = window.document.getElementById(lineIds[0]);
+            top = el.offsetTop;
+            height = el.offsetHeight;
+            parent = el.parentElement.parentElement;
+          if (lineIds.length > 1) {
+            const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+            const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+            height = bottom - top;
+          }
+          if (top !== null && height !== null && parent !== null) {
+            // cook up a div (if necessary) and position it 
+            let div = window.document.getElementById("code-annotation-line-highlight");
+            if (div === null) {
+              div = window.document.createElement("div");
+              div.setAttribute("id", "code-annotation-line-highlight");
+              div.style.position = 'absolute';
+              parent.appendChild(div);
+            }
+            div.style.top = top - 2 + "px";
+            div.style.height = height + 4 + "px";
+            div.style.left = 0;
+            let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+            if (gutterDiv === null) {
+              gutterDiv = window.document.createElement("div");
+              gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+              gutterDiv.style.position = 'absolute';
+              const codeCell = window.document.getElementById(targetCell);
+              const gutter = codeCell.querySelector('.code-annotation-gutter');
+              gutter.appendChild(gutterDiv);
+            }
+            gutterDiv.style.top = top - 2 + "px";
+            gutterDiv.style.height = height + 4 + "px";
+          }
+          selectedAnnoteEl = annoteEl;
+        }
+      };
+      const unselectCodeLines = () => {
+        const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+        elementsIds.forEach((elId) => {
+          const div = window.document.getElementById(elId);
+          if (div) {
+            div.remove();
+          }
+        });
+        selectedAnnoteEl = undefined;
+      };
+        // Handle positioning of the toggle
+    window.addEventListener(
+      "resize",
+      throttle(() => {
+        elRect = undefined;
+        if (selectedAnnoteEl) {
+          selectCodeLines(selectedAnnoteEl);
+        }
+      }, 10)
+    );
+    function throttle(fn, ms) {
+    let throttle = false;
+    let timer;
+      return (...args) => {
+        if(!throttle) { // first call gets through
+            fn.apply(this, args);
+            throttle = true;
+        } else { // all the others get throttled
+            if(timer) clearTimeout(timer); // cancel #2
+            timer = setTimeout(() => {
+              fn.apply(this, args);
+              timer = throttle = false;
+            }, ms);
+        }
+      };
+    }
+      // Attach click handler to the DT
+      const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+      for (const annoteDlNode of annoteDls) {
+        annoteDlNode.addEventListener('click', (event) => {
+          const clickedEl = event.target;
+          if (clickedEl !== selectedAnnoteEl) {
+            unselectCodeLines();
+            const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+            if (activeEl) {
+              activeEl.classList.remove('code-annotation-active');
+            }
+            selectCodeLines(clickedEl);
+            clickedEl.classList.add('code-annotation-active');
+          } else {
+            // Unselect the line
+            unselectCodeLines();
+            clickedEl.classList.remove('code-annotation-active');
+          }
+        });
+      }
+  const findCites = (el) => {
+    const parentEl = el.parentElement;
+    if (parentEl) {
+      const cites = parentEl.dataset.cites;
+      if (cites) {
+        return {
+          el,
+          cites: cites.split(' ')
+        };
+      } else {
+        return findCites(el.parentElement)
+      }
+    } else {
+      return undefined;
+    }
+  };
+  var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+  for (var i=0; i<bibliorefs.length; i++) {
+    const ref = bibliorefs[i];
+    const citeInfo = findCites(ref);
+    if (citeInfo) {
+      tippyHover(citeInfo.el, function() {
+        var popup = window.document.createElement('div');
+        citeInfo.cites.forEach(function(cite) {
+          var citeDiv = window.document.createElement('div');
+          citeDiv.classList.add('hanging-indent');
+          citeDiv.classList.add('csl-entry');
+          var biblioDiv = window.document.getElementById('ref-' + cite);
+          if (biblioDiv) {
+            citeDiv.innerHTML = biblioDiv.innerHTML;
+          }
+          popup.appendChild(citeDiv);
+        });
+        return popup.innerHTML;
+      });
+    }
+  }
+});
+</script>
+</div> <!-- /content -->
+
+
+
+
+</body></html>
